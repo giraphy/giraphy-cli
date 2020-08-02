@@ -1,4 +1,3 @@
-// fields are defined by snake case because select result is used
 import { snakeToCamel } from '../util/string-util';
 
 export type ColumnDefinition = {
@@ -23,15 +22,20 @@ const parseRdbmsDataTypeToGraphQlDataType = (rdbmsDataType: string): string => {
   }
 };
 
-export const parseToArgsPart = (columnDefinitions: ColumnDefinition[]): string => {
+export const parseToArgsPart = (columnDefinitions: ColumnDefinition[], indentCount?: number): string => {
+  indentCount = indentCount ? indentCount : 2;
+  const indent = [...Array(indentCount)].map(_ => "  ").join("");
   return columnDefinitions.map(columnDefinition =>
-    `    ${snakeToCamel(columnDefinition.column_name)}: { type: ${parseRdbmsDataTypeToGraphQlDataType(columnDefinition.data_type)} },`
+    `${indent}${snakeToCamel(columnDefinition.column_name)}: { type: ${parseRdbmsDataTypeToGraphQlDataType(columnDefinition.data_type)} },`
   ).join("\n") + "\n";
 };
 
-export const parseToWherePart = (columnDefinitions: ColumnDefinition[], tableName: string): string => {
-  return `    return Object.keys(args).map(key => \`\${table}.\${${tableName}ObjectType.fieldConfig[key].sqlColumn} = \${SqlString.escape(args[key])}\`)\n` +
-    `      .join(" and ");\n`;
+export const parseToWherePart = (columnDefinitions: ColumnDefinition[], tableName: string, indentCount?: number): string => {
+  indentCount = indentCount ? indentCount : 2;
+  const indent = [...Array(indentCount)].map(_ => "  ").join("");
+
+  return `${indent}return Object.keys(args).map(key => \`\${table}.\${${tableName}.fieldConfig[key].sqlColumn} = \${SqlString.escape(args[key])}\`)\n` +
+    `${indent}  .join(" and ");\n`;
 };
 
 export const parseToColumnDefinitionPart = (columnDefinitions: ColumnDefinition[]): string => {
