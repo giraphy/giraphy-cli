@@ -1,9 +1,11 @@
 import { GraphQLFieldConfig, GraphQLInt, GraphQLList, GraphQLSchema, GraphQLString } from 'graphql';
-import { executeQuery, GiraphyObjectType } from 'giraphy';
 import * as SqlString from 'sqlstring';
+import { GiraphyObjectType } from '@giraphy/giraphy/lib/schema/giraphy-schema';
+import { executeQuery } from '@giraphy/giraphy/lib/schema/rdbms/rdbms-schema';
 
 export const users: GiraphyObjectType<any, any, any> = new GiraphyObjectType({
   name: "Users",
+  // @ts-ignore
   sqlTable: "users",
   uniqueKey: "user_id",
   fields: () => ({
@@ -25,6 +27,7 @@ export const users: GiraphyObjectType<any, any, any> = new GiraphyObjectType({
         body: { type: GraphQLString },
       },
       where: (table: string, args: any, context: any) => {
+        // @ts-ignore
         return Object.keys(args).map(key => `${table}.${comments.fieldConfig[key].sqlColumn} = ${SqlString.escape(args[key])}`)
           .join(" and ");
       },
@@ -32,7 +35,7 @@ export const users: GiraphyObjectType<any, any, any> = new GiraphyObjectType({
   }),
 });
 
-const usersRootQuery: GraphQLFieldConfig<any, any> = {
+export const usersRootQuery: GraphQLFieldConfig<any, any> = {
   type: new GraphQLList(users.objectType),
   resolve: (source, args, context, info) => {
     return executeQuery(info, context)
@@ -41,7 +44,9 @@ const usersRootQuery: GraphQLFieldConfig<any, any> = {
     userId: { type: GraphQLString },
     email: { type: GraphQLString },
   },
+  // @ts-ignore
   where: (table: string, args: any, context: any) => {
+    // @ts-ignore
     return Object.keys(args).map(key => `${table}.${users.fieldConfig[key].sqlColumn} = ${SqlString.escape(args[key])}`)
       .join(" and ");
   },
@@ -49,6 +54,7 @@ const usersRootQuery: GraphQLFieldConfig<any, any> = {
 
 export const comments: GiraphyObjectType<any, any, any> = new GiraphyObjectType({
   name: "Comments",
+  // @ts-ignore
   sqlTable: "comments",
   uniqueKey: "comment_id",
   fields: () => ({
@@ -73,6 +79,7 @@ export const comments: GiraphyObjectType<any, any, any> = new GiraphyObjectType(
         email: { type: GraphQLString },
       },
       where: (table: string, args: any, context: any) => {
+        // @ts-ignore
         return Object.keys(args).map(key => `${table}.${users.fieldConfig[key].sqlColumn} = ${SqlString.escape(args[key])}`)
           .join(" and ");
       },
@@ -80,7 +87,7 @@ export const comments: GiraphyObjectType<any, any, any> = new GiraphyObjectType(
   }),
 });
 
-const commentsRootQuery: GraphQLFieldConfig<any, any> = {
+export const commentsRootQuery: GraphQLFieldConfig<any, any> = {
   type: new GraphQLList(comments.objectType),
   resolve: (source, args, context, info) => {
     return executeQuery(info, context)
@@ -90,7 +97,9 @@ const commentsRootQuery: GraphQLFieldConfig<any, any> = {
     userId: { type: GraphQLString },
     body: { type: GraphQLString },
   },
+  // @ts-ignore
   where: (table: string, args: any, context: any) => {
+    // @ts-ignore
     return Object.keys(args).map(key => `${table}.${comments.fieldConfig[key].sqlColumn} = ${SqlString.escape(args[key])}`)
       .join(" and ");
   },

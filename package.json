@@ -1,6 +1,6 @@
 {
-  "name": "@giraphy/giraphy-scripts",
-  "version": "0.1.0",
+  "name": "@giraphy/giraphy-cli",
+  "version": "0.1.1",
   "description": "giraphy scripts",
   "main": "index.js",
   "scripts": {

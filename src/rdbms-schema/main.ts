@@ -26,7 +26,7 @@ export const createRdbmsSchema = async () => {
 
   const relationDefinitions = (await knex.raw(`select table_name, column_name, referenced_table_name, referenced_column_name from key_column_usage where table_schema = "${dbSetting.database}" and referenced_table_name is not null;`))[0] as RelationDefinition[];
 
-  const result = buildRdbmsSchema(tableRows.map(t => t.table_name), columnDefinitions, relationDefinitions, dbSetting);
-  fs.writeFileSync('schema.js', result);
+  const result = buildRdbmsSchema(tableRows.map(t => t.table_name), columnDefinitions, relationDefinitions);
+  fs.writeFileSync('base-schema.ts', result);
   process.exit(0);
 };

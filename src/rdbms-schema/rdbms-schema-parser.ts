@@ -29,6 +29,7 @@ const buildTableSchema = (tableName: string, allColumnDefinitions: ColumnDefinit
 
   const tableType = `export const ${tableName}: GiraphyObjectType<any, any, any> = new GiraphyObjectType({\n` +
     `  name: "${capitalizeHead(tableName)}",\n` +
+    `  // @ts-ignore\n` +
     `  sqlTable: "${tableName}",\n` +
     `  uniqueKey: "${primaryKey}",\n` +
     `  fields: () => ({\n` +
@@ -37,7 +38,7 @@ const buildTableSchema = (tableName: string, allColumnDefinitions: ColumnDefinit
     `  }),\n` +
     `});\n`;
 
-  const tableRootQuery = `const ${tableName}RootQuery: GraphQLFieldConfig<any, any> = {\n` +
+  const tableRootQuery = `export const ${tableName}RootQuery: GraphQLFieldConfig<any, any> = {\n` +
     `  type: new GraphQLList(${tableName}.objectType),\n` +
     `  resolve: (source, args, context, info) => {\n` +
     `    return executeQuery(info, context)\n` +
@@ -45,6 +46,7 @@ const buildTableSchema = (tableName: string, allColumnDefinitions: ColumnDefinit
     `  args: {\n` +
     argsPart +
     `  },\n` +
+    `  // @ts-ignore\n` +
     `  where: (table: string, args: any, context: any) => {\n` +
     wherePart +
     `  },\n` +
@@ -61,5 +63,6 @@ const columnDefinitionToLowerCase = (columnDefinition: ColumnDefinition): Column
 });
 
 const importStatementPart = 'import { GraphQLFieldConfig, GraphQLInt, GraphQLList, GraphQLSchema, GraphQLString } from \'graphql\';\n' +
-  'import { executeQuery, GiraphyObjectType } from \'giraphy\';\n' +
-  'import * as SqlString from \'sqlstring\';\n\n';
+  'import * as SqlString from \'sqlstring\';\n' +
+  'import { GiraphyObjectType } from \'@giraphy/giraphy/lib/schema/giraphy-schema\';\n' +
+  'import { executeQuery } from \'@giraphy/giraphy/lib/schema/rdbms/rdbms-schema\';\n\n';
