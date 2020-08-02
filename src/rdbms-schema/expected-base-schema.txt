@@ -1,7 +1,7 @@
 import { GraphQLFieldConfig, GraphQLInt, GraphQLList, GraphQLSchema, GraphQLString } from 'graphql';
-import * as SqlString from 'sqlstring';
 import { GiraphyObjectType } from '@giraphy/giraphy/lib/schema/giraphy-schema';
 import { executeQuery } from '@giraphy/giraphy/lib/schema/rdbms/rdbms-schema';
+import { escapeSqlString } from '@giraphy/giraphy/lib/schema/rdbms/rdbms-util';
 
 export const users: GiraphyObjectType<any, any, any> = new GiraphyObjectType({
   name: "Users",

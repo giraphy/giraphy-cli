@@ -63,6 +63,6 @@ const columnDefinitionToLowerCase = (columnDefinition: ColumnDefinition): Column
 });
 
 const importStatementPart = 'import { GraphQLFieldConfig, GraphQLInt, GraphQLList, GraphQLSchema, GraphQLString } from \'graphql\';\n' +
-  'import * as SqlString from \'sqlstring\';\n' +
   'import { GiraphyObjectType } from \'@giraphy/giraphy/lib/schema/giraphy-schema\';\n' +
-  'import { executeQuery } from \'@giraphy/giraphy/lib/schema/rdbms/rdbms-schema\';\n\n';
+  'import { executeQuery } from \'@giraphy/giraphy/lib/schema/rdbms/rdbms-schema\';\n' +
+  'import { escapeSqlString } from \'@giraphy/giraphy/lib/schema/rdbms/rdbms-util\';\n\n';
