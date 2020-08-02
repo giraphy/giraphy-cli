@@ -1,4 +1,4 @@
-import { RelationType } from './relation-definition';
+import { RelationType } from './relation-definition2';
 
 export type RelationSetting = Record<string, Record<string,
   {

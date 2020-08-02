@@ -1,4 +1,6 @@
 // fields are defined by snake case because select result is used
+import { snakeToCamel } from '../util/string-util';
+
 export type ColumnDefinition = {
   table_name: string,
   column_name: string,
@@ -23,27 +25,20 @@ const parseRdbmsDataTypeToGraphQlDataType = (rdbmsDataType: string): string => {
 
 export const parseToArgsPart = (columnDefinitions: ColumnDefinition[]): string => {
   return columnDefinitions.map(columnDefinition =>
-    `    ${columnDefinition.column_name}: { type: ${parseRdbmsDataTypeToGraphQlDataType(columnDefinition.data_type)} },`
+    `    ${snakeToCamel(columnDefinition.column_name)}: { type: ${parseRdbmsDataTypeToGraphQlDataType(columnDefinition.data_type)} },`
   ).join("\n") + "\n";
 };
 
-export const parseToWherePart = (columnDefinitions: ColumnDefinition[], lowerCaseTableName: string): string => {
-  const base = `    let condition = "";\n` +
-  `    let andMaybe = "";\n`;
-
-  return base + columnDefinitions.map((columnDefinition, index) => {
-    return `    if (args.${columnDefinition.column_name}) {\n` +
-      `      condition = condition + andMaybe + \`\${${lowerCaseTableName}Table}.${columnDefinition.column_name} = \${SqlString.escape(args.${columnDefinition.column_name})}\`;\n` +
-      `      andMaybe = " and ";\n` +
-      `    }\n`;
-  }).join("") +
-      "    return condition;\n";
+export const parseToWherePart = (columnDefinitions: ColumnDefinition[], tableName: string): string => {
+  return `    return Object.keys(args).map(key => \`\${table}.\${${tableName}ObjectType.fieldConfig[key].sqlColumn} = \${SqlString.escape(args[key])}\`)\n` +
+    `      .join(" and ");\n`;
 };
 
 export const parseToColumnDefinitionPart = (columnDefinitions: ColumnDefinition[]): string => {
   return columnDefinitions.map(columnDefinition =>
-    `    ${columnDefinition.column_name}: {\n` +
+    `    ${snakeToCamel(columnDefinition.column_name)}: {\n` +
     `      type: ${parseRdbmsDataTypeToGraphQlDataType(columnDefinition.data_type)},\n` +
+    `      sqlColumn: "${columnDefinition.column_name}",\n` +
     `    },`
   ).join("\n") + "\n";
 };

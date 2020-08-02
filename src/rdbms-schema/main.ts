@@ -19,8 +19,8 @@ if (!dbSetting) {
 const relationSetting: RelationSetting | undefined = giraphySetting["relation"];
 
 export const createRdbmsSchema = async () => {
+  // TODO select table_name, column_name, referenced_table_name, referenced_column_name from key_column_usage where table_schema = "example" and referenced_table_name is not null;でリレーションを取得する。
   const knex = createKnex(dbSetting);
-  await knex.raw(`select table_name from information_schema.tables where table_schema = '${dbSetting.database}';`);
   const tableResult = await knex.raw(`select table_name from information_schema.tables where table_schema = '${dbSetting.database}';`);
   const tableRows = tableResult[0] as { table_name: string }[];
   const columnResult = await knex.raw(`select table_name, column_name, data_type, column_key from information_schema.columns where table_schema = '${dbSetting.database}';`);

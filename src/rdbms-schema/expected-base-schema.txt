@@ -1,0 +1,88 @@
+import { GraphQLFieldConfig, GraphQLInt, GraphQLList, GraphQLSchema, GraphQLString } from 'graphql';
+import { executeQuery, GiraphyObjectType } from 'giraphy';
+import * as SqlString from 'sqlstring';
+
+export const users: GiraphyObjectType<any, any, any> = new GiraphyObjectType({
+  name: "Users",
+  sqlTable: "users",
+  uniqueKey: "user_id",
+  fields: () => ({
+    userId: {
+      type: GraphQLString,
+      sqlColumn: "user_id",
+    },
+    email: {
+      type: GraphQLString,
+      sqlColumn: "email",
+    },
+    comments: {
+      type: new GraphQLList(comments.objectType),
+      sqlJoin: (userTable: string, commentTable: string) =>
+        `${userTable}.user_id = ${commentTable}.user_id`,
+    },
+  }),
+});
+
+const usersRootQuery: GraphQLFieldConfig<any, any> = {
+  type: new GraphQLList(users.objectType),
+  resolve: (source, args, context, info) => {
+    return executeQuery(info, context)
+  },
+  args: {
+    userId: { type: GraphQLString },
+    email: { type: GraphQLString },
+  },
+  where: (table: string, args: any, context: any) => {
+    return Object.keys(args).map(key => `${table}.${usersObjectType.fieldConfig[key].sqlColumn} = ${SqlString.escape(args[key])}`)
+      .join(" and ");
+  },
+};
+
+export const comments: GiraphyObjectType<any, any, any> = new GiraphyObjectType({
+  name: "Comments",
+  sqlTable: "comments",
+  uniqueKey: "comment_id",
+  fields: () => ({
+    commentId: {
+      type: GraphQLString,
+      sqlColumn: "comment_id",
+    },
+    userId: {
+      type: GraphQLString,
+      sqlColumn: "user_id",
+    },
+    body: {
+      type: GraphQLString,
+      sqlColumn: "body",
+    },
+    user: {
+      type: users.objectType,
+      sqlJoin: (commentTable: string, userTable: string) =>
+        `${commentTable}.user_id = ${userTable}.user_id`,
+    },
+  }),
+});
+
+const commentsRootQuery: GraphQLFieldConfig<any, any> = {
+  type: new GraphQLList(comments.objectType),
+  resolve: (source, args, context, info) => {
+    return executeQuery(info, context)
+  },
+  args: {
+    commentId: { type: GraphQLString },
+    userId: { type: GraphQLString },
+    body: { type: GraphQLString },
+  },
+  where: (table: string, args: any, context: any) => {
+    return Object.keys(args).map(key => `${table}.${commentsObjectType.fieldConfig[key].sqlColumn} = ${SqlString.escape(args[key])}`)
+      .join(" and ");
+  },
+};
+
+export const rootQueryObjectType = new GiraphyObjectType({
+  name: "Query",
+  fields: () => ({
+    users: usersRootQuery,
+    comments: commentsRootQuery,
+  }),
+});
