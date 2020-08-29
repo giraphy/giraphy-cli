@@ -35,7 +35,7 @@ export const parseToWherePart = (columnDefinitions: ColumnDefinition[], tableNam
   const indent = [...Array(indentCount)].map(_ => "  ").join("");
 
   return `${indent}// @ts-ignore\n` +
-    `${indent}return Object.keys(args).map(key => \`\${table}.\${${tableName}.fieldConfig[key].sqlColumn} = \${SqlString.escape(args[key])}\`)\n` +
+    `${indent}return Object.keys(args).map(key => \`\${table}.\${${tableName}.fieldConfig[key].sqlColumn} = \${escapeSqlString(args[key])}\`)\n` +
     `${indent}  .join(" and ");\n`;
 };
 
